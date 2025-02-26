@@ -101,7 +101,7 @@ const handleCollectionUp = async (collectionData) => {
     updateParams = { published: false };
   }
 
-  console.log("Inactivando productos de la colección", collectionId);
+  console.log("Actualizando productos de la colección", collectionId);
   console.log("Products: ", products.length);
 
 
@@ -109,6 +109,8 @@ const handleCollectionUp = async (collectionData) => {
     return () => updateProduct(product.id, updateParams);
   });
   await processPromisesBatch(productDeletePromises, 10);
+
+  console.log("Productos actualizados");
 
 };
 
