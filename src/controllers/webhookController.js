@@ -55,12 +55,12 @@ async function handleCollectionUpdate(req, res) {
       "-",
       collectionData.title
     );
-    if (processedCollections.has(collectionData.id)) {
-      return res.status(200).send("Evento ya procesado recientemente.");
-    }
+    // if (processedCollections.has(collectionData.id)) {
+    //   return res.status(200).send("Evento ya procesado recientemente.");
+    // }
 
-    processedCollections.add(collectionData.id);
-    setTimeout(() => processedCollections.delete(collectionData.id), 120000);
+    // processedCollections.add(collectionData.id);
+    // setTimeout(() => processedCollections.delete(collectionData.id), 120000);
 
     shopifyService.handleCollectionUp(collectionData).catch(error => {
       console.error("Error en handleCollectionUp:", error);
