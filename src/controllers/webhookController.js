@@ -62,13 +62,14 @@ async function handleCollectionUpdate(req, res) {
     processedCollections.add(collectionData.id);
     setTimeout(() => processedCollections.delete(collectionData.id), 120000);
 
-    await shopifyService.handleCollectionUp(collectionData);
+    shopifyService.handleCollectionUp(collectionData).catch(error => {
+      console.error("Error en handleCollectionUp:", error);
+    });
 
-    console.log("Webhook procesado para el collection ", collectionData.title);
     return res.status(200).send("Webhook recibido");
   } catch (error) {
     console.error("Error handling collection update webhook:", error);
-    res.status(500).send("Internal Server Error");
+    return res.status(500).send("Internal Server Error");
   }
 }
 
