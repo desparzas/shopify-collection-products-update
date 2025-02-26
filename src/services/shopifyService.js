@@ -17,7 +17,7 @@ async function retryWithBackoff(fn, retries = 10, delay = 2000) {
     return await fn();
   } catch (error) {
     if (retries > 0) {
-      console.log(`Rate limit hit, retrying in ${delay}ms...`);
+      // console.log(`Rate limit hit, retrying in ${delay}ms...`);
       await new Promise((resolve) => setTimeout(resolve, delay));
       return retryWithBackoff(fn, retries - 1, delay * 2);
     } else {
@@ -52,7 +52,6 @@ async function getProductsByCollection(collectionId) {
 
     const linkHeader = response.headers["link"];
     const nextPageUrl = getNextPageUrl(linkHeader);
-    console.log(nextPageUrl);
 
     url = nextPageUrl;
   } while (url);
@@ -68,7 +67,6 @@ function getNextPageUrl(linkHeader) {
 }
 
 async function updateProduct(productId, data) {
-  console.log("Updating product: ", productId);
   const url = `https://${SHOP}.myshopify.com/admin/api/2024-01/products/${productId}.json`;
   const response = await axios.put(
     url,
@@ -91,9 +89,6 @@ const handleCollectionUp = async (collectionData) => {
   const publishedAt = collectionData.published_at;
 
   let products = await getProductsByCollection(collectionId);
-  console.log("Productos de la colección", collectionId);
-  console.log(products.length);
-  console.log(products);
   let updateParams = {};
 
   if (publishedAt) {
@@ -107,7 +102,7 @@ const handleCollectionUp = async (collectionData) => {
   }
 
   console.log("Inactivando productos de la colección", collectionId);
-  console.log(products.length);
+  console.log("Products: ", products.length);
 
 
   const productDeletePromises = products.map((product) => {
