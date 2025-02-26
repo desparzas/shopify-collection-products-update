@@ -91,6 +91,9 @@ const handleCollectionUp = async (collectionData) => {
   const publishedAt = collectionData.published_at;
 
   let products = await getProductsByCollection(collectionId);
+  console.log("Productos de la colección", collectionId);
+  console.log(products.length);
+  console.log(products);
   let updateParams = {};
 
   if (publishedAt) {
