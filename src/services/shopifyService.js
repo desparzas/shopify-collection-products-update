@@ -92,16 +92,16 @@ const handleCollectionUp = async (collectionData) => {
   let updateParams = {};
 
   if (publishedAt) {
-    console.log("La colección está publicada");
+    console.log("The collection is active");
     products = products.filter((product) => !product.published_at);
     updateParams = { published: true };
   } else {
-    console.log("La colección está inactiva");
+    console.log("The collection is inactive");
     products = products.filter((product) => product.published_at);
     updateParams = { published: false };
   }
 
-  console.log("Actualizando productos de la colección", collectionId);
+  console.log("Updating product from collection: ", collectionData.title);
   console.log("Products: ", products.length);
 
 
@@ -110,7 +110,7 @@ const handleCollectionUp = async (collectionData) => {
   });
   await processPromisesBatch(productDeletePromises, 10);
 
-  console.log("Productos actualizados");
+  console.log("All products updated");
 
 };
 
