@@ -50,7 +50,7 @@ async function handleCollectionUpdate(req, res) {
     console.log(JSON.stringify(collectionData, null, 2));
 
     console.log(
-      "Procesando webhook para el collection",
+      "Processing webhook fro collection",
       collectionData.id,
       "-",
       collectionData.title
