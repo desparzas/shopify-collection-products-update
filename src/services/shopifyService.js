@@ -59,6 +59,24 @@ async function getProductsByCollection(collectionId) {
   return allProducts;
 }
 
+async function getCollectionsFromProduct(productId) {
+  let collections = [];
+  const response = await shopify.collect.list({
+    product_id: productId,
+  });
+
+  const collectionPromises = response.map((collect) => {
+    return () => shopify.collection.get(collect.collection_id);
+  });
+
+  const c = await processPromisesBatch(collectionPromises, 10);
+
+  return {
+    id: productId,
+    collections: c,
+  };
+}
+
 function getNextPageUrl(linkHeader) {
   if (!linkHeader) return null;
 
@@ -91,19 +109,46 @@ const handleCollectionUp = async (collectionData) => {
   let products = await getProductsByCollection(collectionId);
   let updateParams = {};
 
+  const productCollectionsPromises = products.map((product) => {
+    return () => getCollectionsFromProduct(product.id);
+  });
+
+  const productCollections = await processPromisesBatch(
+    productCollectionsPromises,
+    10
+  );
+
+  products = products.map((product) => {
+    const productCollectionsData = productCollections.find(
+      (pc) => pc.id === product.id
+    );
+
+    productCollectionsData.activeCollections =
+      productCollectionsData.collections.filter(
+        (collection) =>
+          collection.id !== collectionId && collection.published_at
+      );
+
+    product.activeCollections = productCollectionsData.activeCollections;
+    return product;
+  });
+
+
   if (publishedAt) {
-    console.log("The collection is active");
-    products = products.filter((product) => !product.published_at);
+    console.log("The collection is activated");
+    products = products.filter((product) => !product.published_at && product.status === 'active');
     updateParams = { published: true };
   } else {
-    console.log("The collection is inactive");
-    products = products.filter((product) => product.published_at);
+    console.log("The collection is inactived");
+    products = products.filter(
+      (product) =>
+        product.published_at && product.activeCollections.length === 0 && product.status === 'active'
+    );
     updateParams = { published: false };
   }
 
   console.log("Updating product from collection: ", collectionData.title);
   console.log("Products: ", products.length);
-
 
   const productDeletePromises = products.map((product) => {
     return () => updateProduct(product.id, updateParams);
@@ -111,7 +156,6 @@ const handleCollectionUp = async (collectionData) => {
   await processPromisesBatch(productDeletePromises, 10);
 
   console.log("All products updated");
-
 };
 
 module.exports = {
